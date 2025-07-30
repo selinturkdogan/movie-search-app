@@ -4,67 +4,68 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 function MovieDetail() {
   const { imdbID } = useParams();
-  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchMovieDetail = async () => {
-    try {
-      const response = await fetch(`https://www.omdbapi.com/?apikey=5950ce15&i=${imdbID}&plot=full`);
-      const data = await response.json();
-      if (data.Response === 'True') {
-        setMovie(data);
-      } else {
-        alert('Film bilgisi bulunamadı.');
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Hata:', error);
-      alert('Bir hata oluştu.');
-      navigate('/');
-    }
-    setLoading(false);
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchMovieDetail();
+    const fetchMovie = async () => {
+      try {
+        const response = await fetch(`https://www.omdbapi.com/?apikey=5950ce15&i=${imdbID}&plot=full`);
+        const data = await response.json();
+        setMovie(data);
+      } catch (error) {
+        console.error('Hata:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovie();
   }, [imdbID]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-500"></div>
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (!movie || movie.Response === 'False') {
+    return (
+      <div className="min-h-screen flex justify-center items-center text-red-500 text-xl">
+        Film bilgisi bulunamadı.
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-white p-6 md:p-12">
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+        className="mb-6 text-purple-700 hover:underline"
       >
         ← Geri
       </button>
 
-      <div className="flex flex-col md:flex-row gap-10 bg-white shadow-lg rounded-xl overflow-hidden p-6">
+      <div className="flex flex-col lg:flex-row gap-10 bg-white shadow-lg rounded-xl p-6">
         <img
-          src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/400x600'}
+          src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/300x450?text=No+Image'}
           alt={movie.Title}
-          className="w-full md:w-1/3 h-auto rounded-lg"
+          className="w-full max-w-xs rounded-xl object-cover shadow-md"
         />
-        <div className="flex flex-col justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">{movie.Title}</h2>
-            <p className="text-sm text-gray-500 mb-4">{movie.Year} | {movie.Runtime} | {movie.Genre}</p>
-            <p className="text-gray-700 mb-4">{movie.Plot}</p>
-          </div>
-          <div className="space-y-1 text-sm text-gray-600">
+
+        <div className="flex-1 space-y-4">
+          <h1 className="text-3xl font-bold text-purple-800">{movie.Title}</h1>
+          <p className="text-gray-600">{movie.Year} • {movie.Runtime} • {movie.Genre}</p>
+
+          <div className="text-sm text-gray-700 space-y-2">
             <p><strong>Yönetmen:</strong> {movie.Director}</p>
             <p><strong>Oyuncular:</strong> {movie.Actors}</p>
-            <p><strong>IMDb:</strong> ⭐ {movie.imdbRating}</p>
+            <p><strong>IMDb Puanı:</strong> ⭐ {movie.imdbRating}</p>
             <p><strong>Ülke:</strong> {movie.Country}</p>
-            <p><strong>Yapım:</strong> {movie.Production || 'Bilinmiyor'}</p>
+            <p><strong>Özet:</strong> {movie.Plot}</p>
           </div>
         </div>
       </div>
