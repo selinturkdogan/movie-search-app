@@ -1,53 +1,76 @@
-// src/components/SearchBar.js
 import React, { useState } from 'react';
 
 function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
-  const [type, setType] = useState('');
   const [year, setYear] = useState('');
+  const [minRating, setMinRating] = useState('');
+  const [maxRating, setMaxRating] = useState('');
+  const [genre, setGenre] = useState('');
+  const [language, setLanguage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch(query.trim(), type, year);
+    onSearch({ query, year, minRating, maxRating, genre, language });
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col md:flex-row items-center gap-4 justify-center"
+      className="flex flex-col items-center w-full max-w-4xl space-y-4"
     >
       <input
         type="text"
-        placeholder="Film veya dizi adı..."
+        placeholder="Film adı..."
+        className="w-full p-3 border border-gray-300 rounded-md shadow"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="px-4 py-2 rounded-md border border-gray-300 w-64 focus:outline-none focus:ring-2 focus:ring-purple-500"
       />
 
-      <select
-        value={type}
-        onChange={(e) => setType(e.target.value)}
-        className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      >
-        <option value="">Tüm Türler</option>
-        <option value="movie">Film</option>
-        <option value="series">Dizi</option>
-        <option value="episode">Bölüm</option>
-      </select>
-
-      <input
-        type="number"
-        placeholder="Yıl"
-        value={year}
-        onChange={(e) => setYear(e.target.value)}
-        className="px-4 py-2 rounded-md border border-gray-300 w-28 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
+        <input
+          type="number"
+          placeholder="Yıl"
+          className="p-2 border border-gray-300 rounded"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+        />
+        <input
+          type="number"
+          step="0.1"
+          placeholder="Min Puan"
+          className="p-2 border border-gray-300 rounded"
+          value={minRating}
+          onChange={(e) => setMinRating(e.target.value)}
+        />
+        <input
+          type="number"
+          step="0.1"
+          placeholder="Max Puan"
+          className="p-2 border border-gray-300 rounded"
+          value={maxRating}
+          onChange={(e) => setMaxRating(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Tür ID (örn: 28)"
+          className="p-2 border border-gray-300 rounded"
+          value={genre}
+          onChange={(e) => setGenre(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Dil (örn: en, tr)"
+          className="p-2 border border-gray-300 rounded"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+        />
+      </div>
 
       <button
         type="submit"
-        className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
+        className="mt-2 px-6 py-3 bg-purple-600 text-white rounded shadow hover:bg-purple-700 transition"
       >
-        🔍 Ara
+        Ara
       </button>
     </form>
   );
