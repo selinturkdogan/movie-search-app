@@ -10,6 +10,10 @@ const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
 function Home() {
   const [movies, setMovies] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [ratings, setRatings] = useState(() => {
+    const stored = localStorage.getItem('ratings');
+    return stored ? JSON.parse(stored) : {};
+  });
   const [showFavorites, setShowFavorites] = useState(false);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -45,15 +49,16 @@ function Home() {
     }
   }, [filters, page]);
 
-  // 💡 Geri dönünce scroll konumuna dön
   useEffect(() => {
-  if (location.state?.scrollY !== undefined) {
-    setTimeout(() => {
-      window.scrollTo(0, location.state.scrollY);
-    }, 100);
-  }
-}, []);
-
+    if (location.state?.scrollY !== undefined) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: location.state.scrollY,
+          behavior: 'instant',
+        });
+      }, 50);
+    }
+  }, [location]);
 
   const fetchMovies = async (pageNum = 1) => {
     setLoading(true);
@@ -125,6 +130,12 @@ function Home() {
     localStorage.setItem('favorites', JSON.stringify(updated));
   };
 
+  const handleVote = (movieId, vote) => {
+    const updatedRatings = { ...ratings, [movieId]: vote };
+    setRatings(updatedRatings);
+    localStorage.setItem('ratings', JSON.stringify(updatedRatings));
+  };
+
   const totalPages = Math.ceil(totalResults / 20);
 
   return (
@@ -157,7 +168,7 @@ function Home() {
                     state: {
                       fromDetail: true,
                       from: location.pathname + location.search,
-                      scrollY: window.scrollY, // 🟡 scroll konumunu gönder
+                      scrollY: window.scrollY,
                     },
                   })
                 }
@@ -181,13 +192,39 @@ function Home() {
                 >
                   {favorites.some((fav) => fav.id === movie.id) ? '💜' : '🤍'}
                 </button>
+
                 <div className="p-4">
-                  <h2 className="text-lg font-semibold text-gray-800 truncate">
-                    {movie.title}
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    {(movie.release_date || '').slice(0, 4)}
-                  </p>
+                  <h2 className="text-lg font-semibold text-gray-800 truncate">{movie.title}</h2>
+                  <p className="text-sm text-gray-500">{(movie.release_date || '').slice(0, 4)}</p>
+
+                  <div className="flex justify-center gap-4 mt-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVote(movie.id, 'like');
+                      }}
+                      className={`px-2 py-1 rounded-full transition ${
+                        ratings[movie.id] === 'like'
+                          ? 'bg-green-100 text-green-800 font-bold scale-105'
+                          : 'text-green-600 hover:text-green-800'
+                      }`}
+                    >
+                      👍
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVote(movie.id, 'dislike');
+                      }}
+                      className={`px-2 py-1 rounded-full transition ${
+                        ratings[movie.id] === 'dislike'
+                          ? 'bg-red-100 text-red-800 font-bold scale-105'
+                          : 'text-red-600 hover:text-red-800'
+                      }`}
+                    >
+                      👎
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -229,7 +266,7 @@ function Home() {
                         state: {
                           fromDetail: true,
                           from: location.pathname + location.search,
-                          scrollY: window.scrollY, // 🔁 burada da
+                          scrollY: window.scrollY,
                         },
                       })
                     }
