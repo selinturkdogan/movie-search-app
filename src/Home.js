@@ -25,6 +25,7 @@ function Home() {
     maxRating: '',
     genre: '',
     language: '',
+    sortBy: '',
   });
 
   const navigate = useNavigate();
@@ -43,7 +44,8 @@ function Home() {
       filters.minRating ||
       filters.maxRating ||
       filters.language ||
-      filters.year
+      filters.year ||
+      filters.sortBy
     ) {
       fetchMovies(page);
     }
@@ -73,6 +75,7 @@ function Home() {
         if (filters.year) url += `&primary_release_year=${filters.year}`;
         if (filters.genre) url += `&with_genres=${filters.genre}`;
         if (filters.language) url += `&with_original_language=${filters.language}`;
+        if (filters.sortBy) url += `&sort_by=${filters.sortBy}`;
       }
 
       const res = await fetch(url);
@@ -123,6 +126,10 @@ function Home() {
       toast.info('Favorilerden kaldırıldı');
     } else {
       updated = [...favorites, movie];
+      // db con str
+      // con.open
+      //
+      // con.close
       toast.success('Favorilere eklendi!');
     }
 

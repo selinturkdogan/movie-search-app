@@ -1,74 +1,93 @@
+// src/components/SearchBar.js
 import React, { useState } from 'react';
 
 function SearchBar({ onSearch }) {
-  const [query, setQuery] = useState('');
-  const [year, setYear] = useState('');
-  const [minRating, setMinRating] = useState('');
-  const [maxRating, setMaxRating] = useState('');
-  const [genre, setGenre] = useState('');
-  const [language, setLanguage] = useState('');
+  const [filters, setFilters] = useState({
+    query: '',
+    year: '',
+    minRating: '',
+    maxRating: '',
+    genre: '',
+    language: '',
+    sortBy: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearch({ query, year, minRating, maxRating, genre, language });
+    onSearch(filters);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col items-center w-full max-w-4xl space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       <input
         type="text"
-        placeholder="Film adı..."
-        className="w-full p-3 border border-gray-300 rounded-md shadow"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        name="query"
+        placeholder="Film adı"
+        value={filters.query}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      />
+      <input
+        type="text"
+        name="year"
+        placeholder="Yıl"
+        value={filters.year}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      />
+      <input
+        type="number"
+        name="minRating"
+        placeholder="Min IMDb"
+        value={filters.minRating}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      />
+      <input
+        type="number"
+        name="maxRating"
+        placeholder="Max IMDb"
+        value={filters.maxRating}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      />
+      <input
+        type="text"
+        name="genre"
+        placeholder="Tür ID (örnek: 28)"
+        value={filters.genre}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      />
+      <input
+        type="text"
+        name="language"
+        placeholder="Dil (örnek: en, tr)"
+        value={filters.language}
+        onChange={handleChange}
+        className="border p-2 rounded"
       />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
-        <input
-          type="number"
-          placeholder="Yıl"
-          className="p-2 border border-gray-300 rounded"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-        />
-        <input
-          type="number"
-          step="0.1"
-          placeholder="Min Puan"
-          className="p-2 border border-gray-300 rounded"
-          value={minRating}
-          onChange={(e) => setMinRating(e.target.value)}
-        />
-        <input
-          type="number"
-          step="0.1"
-          placeholder="Max Puan"
-          className="p-2 border border-gray-300 rounded"
-          value={maxRating}
-          onChange={(e) => setMaxRating(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Tür ID (örn: 28)"
-          className="p-2 border border-gray-300 rounded"
-          value={genre}
-          onChange={(e) => setGenre(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Dil (örn: en, tr)"
-          className="p-2 border border-gray-300 rounded"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-        />
-      </div>
+      <select
+        name="sortBy"
+        value={filters.sortBy}
+        onChange={handleChange}
+        className="border p-2 rounded"
+      >
+        <option value="">Sıralama Seç</option>
+        <option value="popularity.desc">En Popüler</option>
+        <option value="release_date.desc">En Yeni</option>
+        <option value="vote_average.desc">En Yüksek Oy</option>
+      </select>
 
       <button
         type="submit"
-        className="mt-2 px-6 py-3 bg-purple-600 text-white rounded shadow hover:bg-purple-700 transition"
+        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
       >
         Ara
       </button>
